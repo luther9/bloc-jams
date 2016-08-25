@@ -58,6 +58,24 @@ var albumMarconi = {
   ]
 }
 
+var album2 = {
+  title: 'The Big Songs',
+  artist: 'Bill',
+  label: 'Kraft',
+  year: '2016',
+  albumArtUrl: 'assets/images/album_covers/02.png',
+  songs: [
+    {
+      title: 'Hello',
+      duration: '2:00'
+    },
+    {
+      title: 'Bye',
+      duration: '3:00'
+    }
+  ]
+}
+
 var createSongRow = function(songNumber, songName, songLength) {
   var template =
     '<tr class="album-view-song-item">' +
@@ -94,6 +112,17 @@ var setCurrentAlbum = function(album) {
   }
 }
 
+var albums = [albumPicasso, albumMarconi, album2]
+var currentAlbum = 0
+
 window.onload = function() {
   setCurrentAlbum(albumPicasso)
+
+  var albumCover = document.getElementsByClassName('album-cover-art')[0]
+  albumCover.addEventListener(
+    'click',
+    function() {
+      currentAlbum = (currentAlbum + 1) % albums.length
+      setCurrentAlbum(albums[currentAlbum])
+    })
 }
