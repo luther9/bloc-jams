@@ -98,10 +98,18 @@ var setCurrentAlbum = function(album) {
 // Returns the first node with the given className by searching element and its
 // parent nodes.
 function findParentByClassName(element, className) {
-  if (!element || element.className === className) {
+  if (!element) {
+    alert("No parent found with that class name");
+    return null;
+  }
+  if (element.className === className) {
     return element;
   }
-  return findParentByClassName(element.parentElement, className);
+  var parent = element.parentElement;
+  if (!parent) {
+    alert("No parent found");
+  }
+  return findParentByClassName(parent, className);
 }
 
 // If element is associated with a song row, return the song-item-number element
