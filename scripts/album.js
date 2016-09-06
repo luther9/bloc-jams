@@ -15,11 +15,18 @@ var createSongRow = function(songNumber, songName, songLength) {
       $(this).html(pauseButtonTemplate);
       setSong(parseInt($(this).attr('data-song-number')));
       updatePlayerBarSong();
+      currentSoundFile.play();
       break;
     case parseInt($(this).attr('data-song-number')):
-      $(this).html(playButtonTemplate);
-      $('.main-controls .play-pause').html(playerBarPlayButton);
-      setSong(null);
+      if (currentSoundFile.isPaused()) {
+	currentSoundFile.play();
+	$(this).html(pauseButtonTemplate);
+	$('.main-controls .play-pause').html(playerBarPauseButton);
+      } else {
+	currentSoundFile.pause();
+	$(this).html(playButtonTemplate);
+	$('.main-controls .play-pause').html(playerBarPlayButton);
+      }
       break;
     default:
       var $currentlyPlayingSongElement
@@ -28,6 +35,7 @@ var createSongRow = function(songNumber, songName, songLength) {
       $(this).html(pauseButtonTemplate);
       setSong(parseInt($(this).attr('data-song-number')));
       updatePlayerBarSong();
+      currentSoundFile.play();
     }
   };
 
@@ -90,6 +98,8 @@ var playerBarPauseButton = '<span class="ion-pause"></span>';
 var currentAlbum = null;
 var currentlyPlayingSongNumber = null;
 var currentSongFromAlbum = null;
+var currentSoundFile = null;
+var currentVolume = 80;
 
 // Update the HTML in the player bar based on the current song according to the
 // global variables.
@@ -109,6 +119,7 @@ function nextSong() {
   var songI = trackIndex(currentAlbum, currentSongFromAlbum);
   var newI = (songI + 1) % currentAlbum.songs.length;
   setSong(newI + 1);
+  currentSoundFile.play();
   updatePlayerBarSong();
   var $previousSongElement = getSongNumberCell(previousNumber);
   $previousSongElement.html(previousNumber);
@@ -126,6 +137,7 @@ function previousSong() {
     newI += currentAlbum.songs.length;
   }
   setSong(newI + 1);
+  currentSoundFile.play();
   updatePlayerBarSong();
   var $nextSongElement = getSongNumberCell(nextNumber);
   $nextSongElement.html(nextNumber);
@@ -136,12 +148,32 @@ function previousSong() {
 // Set currentlyPlayingSongNumber and currentSongFromAlbum according to
 // songNumber, which must be a positive integer or null.
 function setSong(songNumber) {
+  if (currentSoundFile) {
+    currentSoundFile.stop();
+  }
+
   currentlyPlayingSongNumber = songNumber;
   currentSongFromAlbum
     = songNumber === null
     ? null
     : currentAlbum.songs[songNumber - 1];
+  // 1
+  currentSoundFile = new buzz.sound(
+    currentSongFromAlbum.audioUrl,
+    {
+      // 2
+      formats: ['mp3'],
+      preload: true
+    });
+
+  setVolume(currentVolume);
 }
+
+var setVolume = function(volume) {
+  if (currentSoundFile) {
+    currentSoundFile.setVolume(volume);
+  }
+};
 
 // Return a jQuery object corresponding to the element that contains the given
 // song number.
