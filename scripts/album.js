@@ -181,11 +181,29 @@ function getSongNumberCell(number) {
   return $('[data-song-number="' + number + '"]');
 }
 
+// If a song is currently playing, toggle between pause and play.
+function togglePlayFromPlayerBar() {
+  if (currentSoundFile) {
+    $numberCell = getSongNumberCell(currentlyPlayingSongNumber);
+    if (currentSoundFile.isPaused()) {
+      $numberCell.html(pauseButtonTemplate);
+      $('.main-controls .play-pause').html(playerBarPauseButton);
+      currentSoundFile.play();
+    } else {
+      $numberCell.html(playButtonTemplate);
+      $('.main-controls .play-pause').html(playerBarPlayButton);
+      currentSoundFile.pause();
+    }
+  }
+}
+
 var $previousButton = $('.main-controls .previous');
 var $nextButton = $('.main-controls .next');
+var $playPauseButton = $('.main-controls .play-pause');
 
 $(document).ready(function() {
   setCurrentAlbum(albumPicasso)
   $previousButton.click(previousSong);
   $nextButton.click(nextSong);
+  $playPauseButton.click(togglePlayFromPlayerBar);
 });
