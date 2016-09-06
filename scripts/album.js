@@ -13,23 +13,20 @@ var createSongRow = function(songNumber, songName, songLength) {
     switch (currentlyPlayingSongNumber) {
     case null:
       $(this).html(pauseButtonTemplate);
-      currentlyPlayingSongNumber = parseInt($(this).attr('data-song-number'));
-      currentSongFromAlbum = currentAlbum.songs[currentlyPlayingSongNumber - 1];
+      setSong(parseInt($(this).attr('data-song-number')));
       updatePlayerBarSong();
       break;
     case parseInt($(this).attr('data-song-number')):
       $(this).html(playButtonTemplate);
       $('.main-controls .play-pause').html(playerBarPlayButton);
-      currentlyPlayingSongNumber = null;
-      currentSongFromAlbum = null;
+      setSong(null);
       break;
     default:
       var $currentlyPlayingSongElement
-	= $('[data-song-number="' + currentlyPlayingSongNumber + '"]');
+	= getSongNumberCell(currentlyPlayingSongNumber);
       $currentlyPlayingSongElement.html(currentlyPlayingSongNumber);
       $(this).html(pauseButtonTemplate);
-      currentlyPlayingSong = $(this).attr('data-song-number');
-      currentSongFromAlbum = currentAlbum.songs[currentlyPlayingSongNumber - 1];
+      setSong(parseInt($(this).attr('data-song-number')));
       updatePlayerBarSong();
     }
   };
@@ -111,13 +108,11 @@ function nextSong() {
   var previousNumber = currentlyPlayingSongNumber;
   var songI = trackIndex(currentAlbum, currentSongFromAlbum);
   var newI = (songI + 1) % currentAlbum.songs.length;
-  currentlyPlayingSongNumber = newI + 1;
-  currentSongFromAlbum = currentAlbum.songs[newI];
+  setSong(newI + 1);
   updatePlayerBarSong();
-  var $previousSongElement = $('[data-song-number="' + previousNumber + '"]');
+  var $previousSongElement = getSongNumberCell(previousNumber);
   $previousSongElement.html(previousNumber);
-  $nextSongElement
-    = $('[data-song-number="' + currentlyPlayingSongNumber + '"]');
+  $nextSongElement = getSongNumberCell(currentlyPlayingSongNumber);
   $nextSongElement.html(pauseButtonTemplate);
 }
 
@@ -130,14 +125,28 @@ function previousSong() {
   if (newI < 0) {
     newI += currentAlbum.songs.length;
   }
-  currentlyPlayingSongNumber = newI + 1;
-  currentSongFromAlbum = currentAlbum.songs[newI];
+  setSong(newI + 1);
   updatePlayerBarSong();
-  var $nextSongElement = $('[data-song-number="' + nextNumber + '"]');
+  var $nextSongElement = getSongNumberCell(nextNumber);
   $nextSongElement.html(nextNumber);
-  $previousSongElement
-    = $('[data-song-number="' + currentlyPlayingSongNumber + '"]');
+  $previousSongElement = getSongNumberCell(currentlyPlayingSongNumber);
   $previousSongElement.html(pauseButtonTemplate);
+}
+
+// Set currentlyPlayingSongNumber and currentSongFromAlbum according to
+// songNumber, which must be a positive integer or null.
+function setSong(songNumber) {
+  currentlyPlayingSongNumber = songNumber;
+  currentSongFromAlbum
+    = songNumber === null
+    ? null
+    : currentAlbum.songs[songNumber - 1];
+}
+
+// Return a jQuery object corresponding to the element that contains the given
+// song number.
+function getSongNumberCell(number) {
+  return $('[data-song-number="' + number + '"]');
 }
 
 var $previousButton = $('.main-controls .previous');
