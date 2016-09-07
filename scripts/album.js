@@ -4,7 +4,7 @@ var createSongRow = function(songNumber, songName, songLength) {
     '  <td class="song-item-number" data-song-number="' + songNumber + '">'
     + songNumber + '</td>' +
     '  <td class="song-item-title">' + songName + '</td>' +
-    '  <td class="song-item-duration">' + songLength + '</td>' +
+    '  <td class="song-item-duration">' + filterTimeCode(songLength) + '</td>' +
     '</tr>'
 
   var $row = $(template);
@@ -113,6 +113,7 @@ function updatePlayerBarSong() {
   $('.artist-name').html(currentAlbum.artist);
 
   $('.main-controls .play-pause').html(playerBarPauseButton);
+  setTotalTimeInPlayerBar(currentSongFromAlbum.duration);
 }
 
 // Update the HTML and global variables to the next song, with wraparound.
@@ -203,6 +204,7 @@ var updateSeekBarWhileSongPlays = function() {
 	var $seekBar = $('.seek-control .seek-bar');
 
 	updateSeekPercentage($seekBar, seekBarFillRatio);
+	setCurrentTimeInPlayerBar(this.getTime());
       });
   }
 };
@@ -268,6 +270,22 @@ var setupSeekBars = function() {
       });
   });
 };
+
+function setCurrentTimeInPlayerBar(currentTime) {
+  $('.current-time').text(filterTimeCode(currentTime));
+}
+
+function setTotalTimeInPlayerBar(totalTime) {
+  $('.total-time').text(filterTimeCode(totalTime));
+}
+
+function filterTimeCode(timeInSeconds) {
+  timeInSeconds = parseFloat(timeInSeconds);
+  var seconds = Math.floor(timeInSeconds) % 60;
+  var minutes = Math.floor(timeInSeconds / 60);
+  // Need sprintf().
+  return '' + minutes + ':' + seconds;
+}
 
 var $previousButton = $('.main-controls .previous');
 var $nextButton = $('.main-controls .next');
